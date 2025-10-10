@@ -4,16 +4,28 @@ import User from '../models/userModel.js';
 // Create a new order
 export const createOrder = async (req, res) => {
   try {
-    const { items, totalAmount } = req.body;
-    
-    // Create the order
+    const { items, totalAmount, adoptionSignature } = req.body;
+    let adoptionAgreementPath = null;
+    if (req.file) {
+      adoptionAgreementPath = `/uploads/${req.file.filename}`;
+    }
+    // Parse items if sent as JSON string
+    let parsedItems = items;
+    if (typeof items === 'string') {
+      parsedItems = JSON.parse(items);
+    }
     const order = new Order({
       user: req.user._id,
-      items,
-      totalAmount
+      items: parsedItems,
+      totalAmount,
+      adoptionAgreement: adoptionAgreementPath,
+      adoptionSignature
     });
-
     await order.save();
+
+    // Fetch the populated order for debugging
+    const populatedOrder = await Order.findById(order._id).populate('items.product');
+    console.log('Populated order:', JSON.stringify(populatedOrder, null, 2));
 
     // Notify all admin users
     const admins = await User.find({ role: 1 });
@@ -80,5 +92,27 @@ export const getAllOrders = async (req, res) => {
       message: 'Error fetching orders',
       error: error.message
     });
+  }
+};
+
+// Update agreement status (admin only)
+export const updateAgreementStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { agreementStatus } = req.body;
+    if (!['accepted', 'rejected'].includes(agreementStatus)) {
+      return res.status(400).json({ success: false, message: 'Invalid status' });
+    }
+    const order = await Order.findByIdAndUpdate(
+      id,
+      { agreementStatus },
+      { new: true }
+    );
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+    res.json({ success: true, order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 }; 

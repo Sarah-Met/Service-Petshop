@@ -9,8 +9,13 @@ const orderSchema = new mongoose.Schema({
   items: [{
     product: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-      required: true
+      required: true,
+      refPath: 'items.kind'
+    },
+    kind: {
+      type: String,
+      required: true,
+      enum: ['Product', 'Pet']
     },
     quantity: {
       type: Number,
@@ -25,6 +30,14 @@ const orderSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ['pending', 'completed'],
+    default: 'pending'
+  },
+  adoptionAgreement: {
+    type: String // store the file path or URL
+  },
+  agreementStatus: {
+    type: String,
+    enum: ['pending', 'accepted', 'rejected'],
     default: 'pending'
   },
   createdAt: {

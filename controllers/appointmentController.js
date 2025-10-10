@@ -5,12 +5,12 @@ import petModel from '../models/petModel.js';
 // Create a new appointment
 export const createAppointment = async (req, res) => {
   try {
-    const { pet, date, notes } = req.body;
-    const user = req.user._id;
+    const { fullName, email, phone, petName, date, notes } = req.body;
+    const user = req.user?._id;
     if (!date) {
       return res.status(400).json({ success: false, message: 'Date is required' });
     }
-    const appointment = new Appointment({ user, pet, date, notes });
+    const appointment = new Appointment({ user, fullName, email, phone, petName, date, notes });
     await appointment.save();
     res.status(201).json({ success: true, message: 'Appointment request submitted', appointment });
   } catch (error) {
