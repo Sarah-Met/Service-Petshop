@@ -52,16 +52,17 @@ export class OrderController {
         return firstValueFrom(this.orderClient.send({ cmd: 'create_order' }, createDto));
     }
 
-    // --- Appointments ---
-    @Get('appointments')
-    async getAllAppointments() {
-        return firstValueFrom(this.orderClient.send({ cmd: 'get_all_appointments' }, {}));
+    @Put('orders/:id')
+    @UseGuards(JwtAuthGuard)
+    async updateOrder(@Param('id') id: string, @Body() updateDto: UpdateOrderDto) {
+        return firstValueFrom(this.orderClient.send({ cmd: 'update_order' }, { id, updateOrderDto: updateDto }));
     }
 
-    @Post('appointments')
+    @Delete('orders/:id')
     @UseGuards(JwtAuthGuard)
-    async createAppointment(@Body() createDto: CreateAppointmentDto, @Request() req) {
-        createDto.user = req.user.userId;
-        return firstValueFrom(this.orderClient.send({ cmd: 'create_appointment' }, createDto));
+    async deleteOrder(@Param('id') id: string) {
+        return firstValueFrom(this.orderClient.send({ cmd: 'delete_order' }, id));
     }
+
+
 }

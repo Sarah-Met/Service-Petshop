@@ -8,8 +8,8 @@ export class Appointment {
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     user: Types.ObjectId;
 
-    @Prop({ type: Types.ObjectId, ref: 'Pet' })
-    pet: Types.ObjectId;
+    @Prop({ required: true })
+    petName: string;
 
     @Prop({ required: true })
     date: Date;
@@ -17,8 +17,11 @@ export class Appointment {
     @Prop({ required: true })
     time: string;
 
-    @Prop({ required: true })
+    @Prop({ required: false, default: 'General Checkup' })
     service: string;
+
+    @Prop({ required: false })
+    notes: string;
 
     @Prop({ default: 'pending', enum: ['pending', 'confirmed', 'completed', 'cancelled'] })
     status: string;

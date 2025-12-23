@@ -241,6 +241,53 @@ const ManageOrders = () => {
                 </td>
                 <td>
                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    {order.status === 'pending' && (
+                      <button
+                        title="Approve Order"
+                        onClick={() => handleStatusChange(order._id, 'processing')}
+                        style={{
+                          background: 'var(--accent-green)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: 4,
+                          padding: '0.4rem',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <FaCheck />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to delete this order?')) {
+                          axiosInstance.delete(`/orders/${order._id}`, {
+                            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                          }).then(() => {
+                            setOrders(prev => prev.filter(o => o._id !== order._id));
+                          }).catch(err => {
+                            console.error('Failed to delete order', err);
+                            alert('Failed to delete order');
+                          });
+                        }
+                      }}
+                      style={{
+                        background: 'var(--primary-red)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 4,
+                        padding: '0.4rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      title="Delete Order"
+                    >
+                      <FaTimes />
+                    </button>
                     <button
                       onClick={() => setExpandedOrderId(expandedOrderId === order._id ? null : order._id)}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18 }}

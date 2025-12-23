@@ -9,7 +9,15 @@ export class AppointmentController {
 
     @MessagePattern({ cmd: 'create_appointment' })
     async createAppointment(@Payload() createAppointmentDto: CreateAppointmentDto) {
-        return this.appointmentService.createAppointment(createAppointmentDto);
+        console.log('AppointmentService: Received create_appointment request', createAppointmentDto);
+        try {
+            const result = await this.appointmentService.createAppointment(createAppointmentDto);
+            console.log('AppointmentService: Created successfully', result);
+            return result;
+        } catch (error) {
+            console.error('AppointmentService: Error creating appointment', error);
+            throw error;
+        }
     }
 
     @MessagePattern({ cmd: 'get_all_appointments' })
@@ -24,7 +32,13 @@ export class AppointmentController {
 
     @MessagePattern({ cmd: 'update_appointment' })
     async updateAppointment(@Payload() payload: { id: string; updateAppointmentDto: UpdateAppointmentDto }) {
-        return this.appointmentService.updateAppointment(payload.id, payload.updateAppointmentDto);
+        console.log(`AppointmentService: Received update request for ${payload.id}`, payload.updateAppointmentDto);
+        try {
+            return await this.appointmentService.updateAppointment(payload.id, payload.updateAppointmentDto);
+        } catch (error) {
+            console.error(`AppointmentService: Error updating appointment ${payload.id}`, error);
+            throw error;
+        }
     }
 
     @MessagePattern({ cmd: 'delete_appointment' })

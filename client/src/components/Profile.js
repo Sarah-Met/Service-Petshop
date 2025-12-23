@@ -281,6 +281,42 @@ const Profile = () => {
                 >
                   View Details
                 </button>
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                  {order.status === 'pending' && (
+                    <button
+                      style={{ padding: '0.5rem 1rem', background: '#ffc107', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                      onClick={async () => {
+                        if (!window.confirm('Cancel this order?')) return;
+                        try {
+                          const token = localStorage.getItem('token');
+                          await axiosInstance.put(`/orders/${order._id}`, { status: 'cancelled' }, { headers: { Authorization: `Bearer ${token}` } });
+                          setOrders(prev => prev.map(o => o._id === order._id ? { ...o, status: 'cancelled' } : o));
+                        } catch (err) {
+                          alert('Failed to cancel order');
+                        }
+                      }}
+                    >
+                      Cancel Order
+                    </button>
+                  )}
+                  {(order.status === 'cancelled' || order.status === 'delivered') && (
+                    <button
+                      style={{ padding: '0.5rem 1rem', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                      onClick={async () => {
+                        if (!window.confirm('Delete this order from history?')) return;
+                        try {
+                          const token = localStorage.getItem('token');
+                          await axiosInstance.delete(`/orders/${order._id}`, { headers: { Authorization: `Bearer ${token}` } });
+                          setOrders(prev => prev.filter(o => o._id !== order._id));
+                        } catch (err) {
+                          alert('Failed to delete order');
+                        }
+                      }}
+                    >
+                      Delete Order
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -483,7 +519,7 @@ const Profile = () => {
                 <div className="appointment-status">
                   <strong>Status</strong>
                   <p className={`status-badge status-${appt.status}`}>
-                    {appt.status.charAt(0).toUpperCase() + appt.status.slice(1)}
+                    {appt.status === 'confirmed' ? 'Approved' : appt.status.charAt(0).toUpperCase() + appt.status.slice(1)}
                   </p>
                 </div>
                 {appt.pet && (

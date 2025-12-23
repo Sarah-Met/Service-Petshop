@@ -31,15 +31,16 @@ const Contact = () => {
     setSuccess('');
 
     try {
-      // Combine date and time into a single datetime string
-      const dateTime = new Date(`${formData.date}T${formData.time}`);
+      // Submit date as just the date component or full object (DTO handles it), but ensure time is sent separately
       const payload = {
         fullName: formData.fullName,
         email: formData.email,
         phone: formData.phone,
         petName: formData.pet,
-        date: dateTime,
-        notes: formData.reason // Only send the reason as the description
+        date: new Date(formData.date), // Send date object
+        time: formData.time,          // Send time string separately
+        notes: formData.reason,       // Map reason to notes
+        service: 'General Checkup'    // Default service
       };
       const res = await axiosInstance.post('/appointments', payload);
       if (res.data.success) {

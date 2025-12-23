@@ -142,8 +142,14 @@ const DashboardHome = () => {
     }
   };
 
+
+
+
+
+
   // Fetch all appointments for admin
   const fetchAppointments = async () => {
+
     setAppointmentsLoading(true);
     setAppointmentsError('');
     try {
@@ -220,6 +226,10 @@ const DashboardHome = () => {
           onRetry={() => handleRetry('users')}
         />
       </div>
+
+
+
+
       <div className="panel-header" style={{ marginTop: '2rem' }}>
         <h2 className="panel-title">All Appointments</h2>
       </div>
@@ -259,7 +269,9 @@ const DashboardHome = () => {
                   <td>{appt.petName || (appt.pet ? appt.pet.name : 'N/A')}</td>
                   <td>{appt.date ? new Date(appt.date).toLocaleString() : 'N/A'}</td>
                   <td>
-                    <span className={`status-badge status-${appt.status}`}>{appt.status}</span>
+                    <span className={`status-badge status-${appt.status}`}>
+                      {appt.status === 'confirmed' ? 'approved' : appt.status}
+                    </span>
                   </td>
                   <td>{appt.notes || ''}</td>
                   <td>
@@ -285,10 +297,11 @@ const DashboardHome = () => {
                           onClick={async () => {
                             try {
                               const token = localStorage.getItem('token');
-                              await axiosInstance.put(`/appointments/${appt._id}/approve`, {}, { headers: { Authorization: `Bearer ${token}` } });
-                              setAppointments(prev => prev.map(a => a._id === appt._id ? { ...a, status: 'approved' } : a));
+                              await axiosInstance.put(`/appointments/${appt._id}`, { status: 'confirmed' }, { headers: { Authorization: `Bearer ${token}` } });
+                              setAppointments(prev => prev.map(a => a._id === appt._id ? { ...a, status: 'confirmed' } : a));
                             } catch (err) {
-                              alert('Failed to approve appointment');
+                              console.error('Approve error:', err);
+                              alert(`Failed to approve appointment: ${err.response?.data?.message || err.message}`);
                             }
                           }}
                         >
@@ -315,10 +328,11 @@ const DashboardHome = () => {
                             if (!window.confirm('Are you sure you want to reject this appointment?')) return;
                             try {
                               const token = localStorage.getItem('token');
-                              await axiosInstance.put(`/appointments/${appt._id}/reject`, {}, { headers: { Authorization: `Bearer ${token}` } });
-                              setAppointments(prev => prev.map(a => a._id === appt._id ? { ...a, status: 'rejected' } : a));
+                              await axiosInstance.put(`/appointments/${appt._id}`, { status: 'cancelled' }, { headers: { Authorization: `Bearer ${token}` } });
+                              setAppointments(prev => prev.map(a => a._id === appt._id ? { ...a, status: 'cancelled' } : a));
                             } catch (err) {
-                              alert('Failed to reject appointment');
+                              console.error('Reject error:', err);
+                              alert(`Failed to reject appointment: ${err.response?.data?.message || err.message}`);
                             }
                           }}
                         >

@@ -26,7 +26,7 @@ export class AppointmentService {
 
     async getAllAppointments() {
         try {
-            const appointments = await this.appointmentModel.find().populate('user', '-password').populate('pet');
+            const appointments = await this.appointmentModel.find().populate('user', '-password');
             return {
                 success: true,
                 count: appointments.length,
@@ -39,7 +39,7 @@ export class AppointmentService {
 
     async getAppointmentById(id: string) {
         try {
-            const appointment = await this.appointmentModel.findById(id).populate('user', '-password').populate('pet');
+            const appointment = await this.appointmentModel.findById(id).populate('user', '-password');
             if (!appointment) {
                 throw new RpcException({ message: 'Appointment not found', status: 404 });
             }
@@ -59,7 +59,7 @@ export class AppointmentService {
                 id,
                 updateAppointmentDto,
                 { new: true, runValidators: true }
-            ).populate('user', '-password').populate('pet');
+            ).populate('user', '-password');
 
             if (!appointment) {
                 throw new RpcException({ message: 'Appointment not found', status: 404 });
